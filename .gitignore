@@ -1,0 +1,12 @@
+#Secrets: Not To Be Committed
+secrets/
+.env
+*.key
+
+#Chain data
+chain/data/
+*.log
+
+#OS/editor
+.DS_Store
+node_modules/
