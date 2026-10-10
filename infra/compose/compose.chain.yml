@@ -1,0 +1,94 @@
+name: chain-dev
+
+networks:
+  validator-net:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  validator1-data:
+  validator2-data:
+  validator3-data:
+  validator4-data:
+
+services:
+  validator1:
+    image: hyperledger/besu:${BESU_VERSION}
+    restart: unless-stopped
+    command:
+      - --genesis-file=/config/genesis.json
+      - --node-private-key-file=/keys/key
+      - --data-path=/var/lib/besu
+      - --data-storage-format=BONSAI
+      - --min-gas-price=0
+      - --p2p-host=172.30.0.11
+      - --rpc-http-enabled
+      - --rpc-http-host=0.0.0.0
+      - --rpc-http-api=ETH,NET,WEB3,QBFT
+    ports:
+      - "127.0.0.1:8545:8545"
+    volumes:
+      - validator1-data:/var/lib/besu
+      - ../../secrets/dev/genesis.json:/config/genesis.json:ro
+      - ../../secrets/dev/validator1/key:/keys/key:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.11
+
+  validator2:
+    image: hyperledger/besu:${BESU_VERSION}
+    restart: unless-stopped
+    command:
+      - --genesis-file=/config/genesis.json
+      - --node-private-key-file=/keys/key
+      - --data-path=/var/lib/besu
+      - --data-storage-format=BONSAI
+      - --min-gas-price=0
+      - --p2p-host=172.30.0.12
+      - --bootnodes=${BOOTNODE_ENODE}
+    volumes:
+      - validator2-data:/var/lib/besu
+      - ../../secrets/dev/genesis.json:/config/genesis.json:ro
+      - ../../secrets/dev/validator2/key:/keys/key:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.12
+
+  validator3:
+    image: hyperledger/besu:${BESU_VERSION}
+    restart: unless-stopped
+    command:
+      - --genesis-file=/config/genesis.json
+      - --node-private-key-file=/keys/key
+      - --data-path=/var/lib/besu
+      - --data-storage-format=BONSAI
+      - --min-gas-price=0
+      - --p2p-host=172.30.0.13
+      - --bootnodes=${BOOTNODE_ENODE}
+    volumes:
+      - validator3-data:/var/lib/besu
+      - ../../secrets/dev/genesis.json:/config/genesis.json:ro
+      - ../../secrets/dev/validator3/key:/keys/key:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.13
+
+  validator4:
+    image: hyperledger/besu:${BESU_VERSION}
+    restart: unless-stopped
+    command:
+      - --genesis-file=/config/genesis.json
+      - --node-private-key-file=/keys/key
+      - --data-path=/var/lib/besu
+      - --data-storage-format=BONSAI
+      - --min-gas-price=0
+      - --p2p-host=172.30.0.14
+      - --bootnodes=${BOOTNODE_ENODE}
+    volumes:
+      - validator4-data:/var/lib/besu
+      - ../../secrets/dev/genesis.json:/config/genesis.json:ro
+      - ../../secrets/dev/validator4/key:/keys/key:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.14

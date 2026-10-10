@@ -30,3 +30,7 @@ done
 
 rm -rf "$TMP"
 echo "Done. Generated $((i-1)) validators in $OUT/"
+
+PUB=$(tr -d '\n' < "$OUT/validator1/key.pub" | sed 's/^0x//')
+echo "BOOTNODE_ENODE=enode://${PUB}@172.30.0.11:30303" > "$OUT/bootnode.env"
+echo "Wrote $OUT/bootnode.env"
