@@ -9,6 +9,8 @@ OUT=secrets/dev
 TMP=secrets/networkFiles
 
 rm -rf "$OUT" "$TMP"
+# Besu will not create missing parent directories
+mkdir -p "$OUT"
 
 docker run --rm --user "$(id -u):$(id -g)" \
   -v "$(pwd)":/work -w /work \
@@ -18,7 +20,6 @@ docker run --rm --user "$(id -u):$(id -g)" \
   --to=/work/"$TMP" \
   --private-key-file-name=key
 
-mkdir -p "$OUT"
 cp "$TMP/genesis.json" "$OUT/genesis.json"
 
 i=1
