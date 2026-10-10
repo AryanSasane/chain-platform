@@ -16,6 +16,10 @@ services:
   validator1:
     image: hyperledger/besu:${BESU_VERSION}
     restart: unless-stopped
+    # Shared host: cap each node so a leak cannot starve other workloads
+    mem_limit: 2g
+    environment:
+      BESU_OPTS: -Xmx1g
     command:
       - --genesis-file=/config/genesis.json
       - --node-private-key-file=/keys/key
@@ -39,6 +43,10 @@ services:
   validator2:
     image: hyperledger/besu:${BESU_VERSION}
     restart: unless-stopped
+    # Shared host: cap each node so a leak cannot starve other workloads
+    mem_limit: 2g
+    environment:
+      BESU_OPTS: -Xmx1g
     command:
       - --genesis-file=/config/genesis.json
       - --node-private-key-file=/keys/key
@@ -58,6 +66,10 @@ services:
   validator3:
     image: hyperledger/besu:${BESU_VERSION}
     restart: unless-stopped
+    # Shared host: cap each node so a leak cannot starve other workloads
+    mem_limit: 2g
+    environment:
+      BESU_OPTS: -Xmx1g
     command:
       - --genesis-file=/config/genesis.json
       - --node-private-key-file=/keys/key
@@ -77,6 +89,10 @@ services:
   validator4:
     image: hyperledger/besu:${BESU_VERSION}
     restart: unless-stopped
+    # Shared host: cap each node so a leak cannot starve other workloads
+    mem_limit: 2g
+    environment:
+      BESU_OPTS: -Xmx1g
     command:
       - --genesis-file=/config/genesis.json
       - --node-private-key-file=/keys/key
