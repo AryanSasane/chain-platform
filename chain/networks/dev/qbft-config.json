@@ -1,7 +1,7 @@
 {
 "genesis": {
 "config": {
-      "chainId": 2026100,
+      "chainId": 20260001,
       "berlinBlock": 0,
       "londonBlock": 0,
       "shanghaiTime": 0,
