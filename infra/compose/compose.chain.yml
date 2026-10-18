@@ -5,12 +5,19 @@ networks:
     ipam:
       config:
         - subnet: 172.30.0.0/24
+  # Application-facing side: backend and indexer join this one, never validator-net
+  rpc-net:
+    ipam:
+      config:
+        - subnet: 172.31.0.0/24
 
 volumes:
   validator1-data:
   validator2-data:
   validator3-data:
   validator4-data:
+  rpc1-data:
+  rpc2-data:
   prometheus-data:
   grafana-data:
 
@@ -33,11 +40,7 @@ services:
       - --metrics-enabled
       - --metrics-host=0.0.0.0
       - --host-allowlist=validator1,localhost,127.0.0.1
-      - --rpc-http-enabled
-      - --rpc-http-host=0.0.0.0
-      - --rpc-http-api=ETH,NET,WEB3,QBFT
     ports:
-      - "127.0.0.1:8545:8545"
       - "127.0.0.1:9545:9545"
     volumes:
       - validator1-data:/var/lib/besu
@@ -134,6 +137,71 @@ services:
     networks:
       validator-net:
         ipv4_address: 172.30.0.14
+
+  # Non-validator nodes: serve JSON-RPC so validators never have to
+  rpc1:
+    image: hyperledger/besu:${BESU_VERSION}
+    restart: unless-stopped
+    mem_limit: 2g
+    environment:
+      BESU_OPTS: -Xmx1g
+    command: &rpc-command
+      - --genesis-file=/config/genesis.json
+      - --data-path=/var/lib/besu
+      - --data-storage-format=BONSAI
+      - --min-gas-price=0
+      - --static-nodes-file=/config/static-nodes.json
+      # Default waits for 5 peers before syncing; only 4 validators exist
+      - --sync-min-peers=1
+      - --metrics-enabled
+      - --metrics-host=0.0.0.0
+      - --host-allowlist=rpc1,rpc2,localhost,127.0.0.1
+      - --rpc-http-enabled
+      - --rpc-http-host=0.0.0.0
+      - --rpc-http-api=ETH,NET,WEB3,QBFT
+      - --rpc-ws-enabled
+      - --rpc-ws-host=0.0.0.0
+      - --rpc-ws-api=ETH,NET,WEB3
+    volumes:
+      - rpc1-data:/var/lib/besu
+      - ../../secrets/dev/genesis.json:/config/genesis.json:ro
+      - ../../secrets/dev/static-nodes.json:/config/static-nodes.json:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.31
+      rpc-net:
+        ipv4_address: 172.31.0.31
+
+  rpc2:
+    image: hyperledger/besu:${BESU_VERSION}
+    restart: unless-stopped
+    mem_limit: 2g
+    environment:
+      BESU_OPTS: -Xmx1g
+    command: *rpc-command
+    volumes:
+      - rpc2-data:/var/lib/besu
+      - ../../secrets/dev/genesis.json:/config/genesis.json:ro
+      - ../../secrets/dev/static-nodes.json:/config/static-nodes.json:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.32
+      rpc-net:
+        ipv4_address: 172.31.0.32
+
+  rpc-lb:
+    image: nginx:${NGINX_VERSION}
+    restart: unless-stopped
+    mem_limit: 128m
+    depends_on: [rpc1, rpc2]
+    ports:
+      - "127.0.0.1:8545:8545"
+      - "127.0.0.1:8546:8546"
+    volumes:
+      - ../rpc/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      rpc-net:
+        ipv4_address: 172.31.0.30
 
   prometheus:
     image: prom/prometheus:${PROMETHEUS_VERSION}
