@@ -1,7 +1,7 @@
 .RECIPEPREFIX = >
 .PHONY: up down logs reset
 
-COMPOSE = docker compose --env-file .env.example --env-file secrets/dev/bootnode.env -f infra/compose/compose.chain.yml
+COMPOSE = docker compose --env-file .env.example -f infra/compose/compose.chain.yml
 
 up:
 > $(COMPOSE) up -d
