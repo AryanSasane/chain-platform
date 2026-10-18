@@ -28,11 +28,14 @@ services:
       - --min-gas-price=0
       - --p2p-host=172.30.0.11
       - --static-nodes-file=/config/static-nodes.json
+      - --metrics-enabled
+      - --metrics-host=0.0.0.0
       - --rpc-http-enabled
       - --rpc-http-host=0.0.0.0
       - --rpc-http-api=ETH,NET,WEB3,QBFT
     ports:
       - "127.0.0.1:8545:8545"
+      - "127.0.0.1:9545:9545"
     volumes:
       - validator1-data:/var/lib/besu
       - ../../secrets/dev/genesis.json:/config/genesis.json:ro
@@ -57,6 +60,10 @@ services:
       - --min-gas-price=0
       - --p2p-host=172.30.0.12
       - --static-nodes-file=/config/static-nodes.json
+      - --metrics-enabled
+      - --metrics-host=0.0.0.0
+    ports:
+      - "127.0.0.1:9546:9545"
     volumes:
       - validator2-data:/var/lib/besu
       - ../../secrets/dev/genesis.json:/config/genesis.json:ro
@@ -81,6 +88,10 @@ services:
       - --min-gas-price=0
       - --p2p-host=172.30.0.13
       - --static-nodes-file=/config/static-nodes.json
+      - --metrics-enabled
+      - --metrics-host=0.0.0.0
+    ports:
+      - "127.0.0.1:9547:9545"
     volumes:
       - validator3-data:/var/lib/besu
       - ../../secrets/dev/genesis.json:/config/genesis.json:ro
@@ -105,6 +116,10 @@ services:
       - --min-gas-price=0
       - --p2p-host=172.30.0.14
       - --static-nodes-file=/config/static-nodes.json
+      - --metrics-enabled
+      - --metrics-host=0.0.0.0
+    ports:
+      - "127.0.0.1:9548:9545"
     volumes:
       - validator4-data:/var/lib/besu
       - ../../secrets/dev/genesis.json:/config/genesis.json:ro
