@@ -38,3 +38,7 @@ for n in $(seq 1 $((i-1))); do
   echo "\"enode://${PUB}@172.30.0.1$n:30303\""
 done | paste -sd, | sed 's/^/[/; s/$/]/' > "$OUT/static-nodes.json"
 echo "Wrote $OUT/static-nodes.json"
+
+# Only applies on Grafana's first start; make reset wipes its volume too, so they stay in step
+echo "GF_SECURITY_ADMIN_PASSWORD=$(openssl rand -hex 16)" > "$OUT/grafana.env"
+echo "Wrote $OUT/grafana.env"

@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: besu-validators
+    static_configs:
+      - targets:
+          - validator1:9545
+          - validator2:9545
+          - validator3:9545
+          - validator4:9545

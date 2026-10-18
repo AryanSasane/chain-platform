@@ -11,6 +11,8 @@ volumes:
   validator2-data:
   validator3-data:
   validator4-data:
+  prometheus-data:
+  grafana-data:
 
 services:
   validator1:
@@ -30,6 +32,7 @@ services:
       - --static-nodes-file=/config/static-nodes.json
       - --metrics-enabled
       - --metrics-host=0.0.0.0
+      - --host-allowlist=validator1,localhost,127.0.0.1
       - --rpc-http-enabled
       - --rpc-http-host=0.0.0.0
       - --rpc-http-api=ETH,NET,WEB3,QBFT
@@ -62,6 +65,7 @@ services:
       - --static-nodes-file=/config/static-nodes.json
       - --metrics-enabled
       - --metrics-host=0.0.0.0
+      - --host-allowlist=validator2,localhost,127.0.0.1
     ports:
       - "127.0.0.1:9546:9545"
     volumes:
@@ -90,6 +94,7 @@ services:
       - --static-nodes-file=/config/static-nodes.json
       - --metrics-enabled
       - --metrics-host=0.0.0.0
+      - --host-allowlist=validator3,localhost,127.0.0.1
     ports:
       - "127.0.0.1:9547:9545"
     volumes:
@@ -118,6 +123,7 @@ services:
       - --static-nodes-file=/config/static-nodes.json
       - --metrics-enabled
       - --metrics-host=0.0.0.0
+      - --host-allowlist=validator4,localhost,127.0.0.1
     ports:
       - "127.0.0.1:9548:9545"
     volumes:
@@ -128,3 +134,32 @@ services:
     networks:
       validator-net:
         ipv4_address: 172.30.0.14
+
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION}
+    restart: unless-stopped
+    mem_limit: 512m
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - prometheus-data:/prometheus
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.20
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION}
+    restart: unless-stopped
+    mem_limit: 768m
+    env_file: ../../secrets/dev/grafana.env
+    ports:
+      - "127.0.0.1:3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ../monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
+      - ../monitoring/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ../monitoring/grafana/chain.json:/etc/grafana/dashboards/chain.json:ro
+    networks:
+      validator-net:
+        ipv4_address: 172.30.0.21
